@@ -6,14 +6,12 @@ public class ScaleController : MonoBehaviour
 {
     [SerializeField] GameObject smallNotchPrefab;
     [SerializeField] GameObject largeNotchPrefab;
-    [SerializeField] Camera mainCamera;
+    [SerializeField] MainCameraController mainCamera;
     [SerializeField] float largeNotchX, smallNotchX;
-    [SerializeField] int firstInterval;
     [SerializeField] int smallNotchesInterval;
     [SerializeField] int largeNotchesInterval;
     int smallNotchesToRender = 10;
     int largeNotchesToRender = 5;
-    // Start is called before the first frame update
     List<GameObject> activeNotches = new List<GameObject>();
     ObjectPool smallNotchPool;
     ObjectPool largeNotchPool;
@@ -28,11 +26,14 @@ public class ScaleController : MonoBehaviour
         smallNotchPool = new ObjectPool(smallNotchPrefab, smallNotchesToRender);
         largeNotchPool = new ObjectPool(largeNotchPrefab, largeNotchesToRender);
 
-        cameraHeight = 2f * mainCamera.orthographicSize;
-        cameraWidth = cameraHeight * mainCamera.aspect;
+        getOriginalCameraSize();
         highestRendered = lowestRendered = 0;
     }
-
+    void getOriginalCameraSize()
+    {
+        cameraHeight = 2f * mainCamera.originalOrthographicSize;
+        cameraWidth = cameraHeight * mainCamera.originalAspect;
+    }
     void RenderNotches()
     {
 
@@ -43,7 +44,7 @@ public class ScaleController : MonoBehaviour
 
 
         // render down
-        for (int pos = lowestRendered; pos > Mathf.Round(cameraMiddle - cameraHeight); pos--)
+        for (int pos = Mathf.Max(0, lowestRendered); pos >= Mathf.Max(0, Mathf.Round(cameraMiddle - cameraHeight)); pos--)
             if (pos % largeNotchesInterval == 0 || pos % smallNotchesInterval == 0)
                 RenderSingleNotch(pos);
         highestRendered = (int)Mathf.Round(cameraMiddle + cameraHeight);
@@ -92,12 +93,14 @@ public class ScaleController : MonoBehaviour
 
 
 
-
-    // Update is called once per frame
     void Update()
     {
-
-        cameraMiddle = mainCamera.transform.position.y;
+        if (cameraHeight == 0f || cameraWidth == 0f)
+        {
+            getOriginalCameraSize();
+            return;
+        }
+        cameraMiddle = mainCamera.currentCameraPositionY;
         RenderNotches();
     }
 }

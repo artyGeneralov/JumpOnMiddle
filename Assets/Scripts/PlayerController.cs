@@ -4,29 +4,54 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]Rigidbody2D rb;
+    Rigidbody2D rb;
     [SerializeField] float thrust;
     [SerializeField] float rotSpeed = 5;
+    [SerializeField] float maxVelocity;
     float curPos, lastPos;
-    // Start is called before the first frame update
+    bool isScriptReady;
+
     void Start()
     {
-        curPos = lastPos = rb.position.x;
+        isScriptReady = false;
+        StartCoroutine(StartWhenReady());
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator StartWhenReady()
     {
-        curPos = rb.position.x;
-        float linSpeed = curPos - lastPos;
-        linSpeed = Mathf.Pow(linSpeed, 10);
-        Debug.Log("linspeed = " + linSpeed + "rotation " + rb.rotation);
-        
+        while(rb == null)
+        {
+            rb = GetComponent<Rigidbody2D>();
+            yield return null;
+        }
+        curPos = lastPos = rb.position.x;
+        isScriptReady = true;
+
+    }
+    void FixedUpdate()
+    {
+        if (isScriptReady == false)
+            return;
+
         //rb.rotation += rotSpeed;
-        Vector3 jumpForce = new Vector3(thrust,thrust, 0);
-        if (Input.GetKeyDown(KeyCode.Space))
+        Vector3 jumpForce = new Vector3(thrust, thrust, 0);
+        if (Input.GetKeyDown(KeyCode.W))
+        {
             rb.AddForce(jumpForce, ForceMode2D.Impulse);
+        }
         lastPos = curPos;
-        
+
+
+        ClampVelocity();
+    }
+
+    void ClampVelocity()
+    {
+        Vector2 currentVelocity = rb.velocity;
+
+        if(currentVelocity.magnitude > maxVelocity)
+        {
+            rb.velocity = currentVelocity.normalized * maxVelocity;
+        }
     }
 }
