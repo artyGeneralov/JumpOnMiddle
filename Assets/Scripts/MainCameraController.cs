@@ -38,11 +38,11 @@ public class MainCameraController : MonoBehaviour
     {
 
         // follow player
-
+        
 
         currentCameraPositionY = mainCamera.transform.position.y;
 
-/*        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButton(1))
         {
 
             ZoomOut();
@@ -55,7 +55,7 @@ public class MainCameraController : MonoBehaviour
                         Mathf.MoveTowards(mainCamera.transform.position.y, player.transform.position.y, playerFollowSpeed * Time.deltaTime),
                         mainCamera.transform.position.z);
         }
-*/
+        FollowPlayer();
 
     }
 
