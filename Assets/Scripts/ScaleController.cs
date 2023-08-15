@@ -14,14 +14,11 @@ public class ScaleController : MonoBehaviour
     [SerializeField] int largeNotchesInterval;
 
 
-   /*SerializeField*/ public int visibleScaleSize;
-    int notchesToRender = 5;
-    int maxPoolSize = 20;
+    /*Serialized:*/ public int visibleScaleSize;
+
+
+    int defaultPoolSize = 20;
     NotchPool notchPool;
-
-
-
-    float cameraHeight, cameraWidth;
     float cameraMiddle;
     int highestRendered, lowestRendered;
     int lowerBound, upperBound;
@@ -29,9 +26,8 @@ public class ScaleController : MonoBehaviour
 
     void Start()
     {
-        //GetOriginalCameraSize();
         GetCurrentCameraPosition();
-        notchPool = new NotchPool(largeNotchPrefab, smallNotchPrefab, maxPoolSize);
+        notchPool = new NotchPool(largeNotchPrefab, smallNotchPrefab, defaultPoolSize);
         setCurrentBounds();
         lowestRendered = highestRendered = lowerBound;
         
