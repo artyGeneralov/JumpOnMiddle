@@ -9,6 +9,7 @@ public class WallScaler : MonoBehaviour
     [SerializeField] GameObject platform;
     void Start()
     {
+        platform = GameObject.FindGameObjectWithTag("Platform");
         startPoint = transform.position.y;
         endPoint = platform.transform.position.y;
         float height = endPoint - startPoint;

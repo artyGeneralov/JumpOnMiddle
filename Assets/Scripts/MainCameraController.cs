@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MainCameraController : MonoBehaviour
 {
-
+    
     [SerializeField] float maxZoomOut;
     [SerializeField] float zoomOutSpeed;
     [SerializeField] float zoomInSpeed;
@@ -13,16 +13,21 @@ public class MainCameraController : MonoBehaviour
     [SerializeField] float playerFollowSpeed;
     [SerializeField] Camera mainCamera;
     [SerializeField] GameObject player;
+    [SerializeField] int scaleSizeOnZoom;
     public float originalAspect { get; private set; }
     public float originalOrthographicSize { get; private set; }
 
     public float currentCameraPositionY { get; private set; }
     public float currentCameraPositionX { get; private set; }
 
+    ScaleController scale;
+    [HideInInspector] public int originalScaleSize;
+
 
     void Start()
     {
-
+        scale = FindObjectOfType<ScaleController>();
+        originalScaleSize = scale.visibleScaleSize;
         originalAspect = mainCamera.aspect;
         originalOrthographicSize = mainCamera.orthographicSize;
         currentCameraPositionY = mainCamera.transform.position.y;
@@ -31,9 +36,13 @@ public class MainCameraController : MonoBehaviour
 
     void Update()
     {
-        currentCameraPositionY = player.transform.position.y;
 
-        if (Input.GetMouseButton(1))
+        // follow player
+
+
+        currentCameraPositionY = mainCamera.transform.position.y;
+
+/*        if (Input.GetMouseButton(1))
         {
 
             ZoomOut();
@@ -46,21 +55,34 @@ public class MainCameraController : MonoBehaviour
                         Mathf.MoveTowards(mainCamera.transform.position.y, player.transform.position.y, playerFollowSpeed * Time.deltaTime),
                         mainCamera.transform.position.z);
         }
-
+*/
 
     }
 
+    public void FollowPlayer()
+    {
+            mainCamera.transform.position = new Vector3(mainCamera.transform.position.x,
+            Mathf.MoveTowards(mainCamera.transform.position.y, player.transform.position.y, playerFollowSpeed * Time.deltaTime),
+            mainCamera.transform.position.z);
+    }
 
-    void ZoomOut()
+
+    public void ZoomOut()
     {
         mainCamera.orthographicSize = Mathf.MoveTowards(mainCamera.orthographicSize, maxZoomOut, zoomOutSpeed * Time.deltaTime);
         mainCamera.transform.position = new Vector3(mainCamera.transform.position.x,
                                 Mathf.MoveTowards(mainCamera.transform.position.y, player.transform.position.y + zoomOutPositionChange, zoomOutSpeed * Time.deltaTime),
                                 mainCamera.transform.position.z);
+        
+        scale.visibleScaleSize = scaleSizeOnZoom;
     }
 
-    void ZoomIn()
+    public void ZoomIn()
     {
         mainCamera.orthographicSize = Mathf.MoveTowards(mainCamera.orthographicSize, orginalZoom, zoomInSpeed * Time.deltaTime);
+        if(mainCamera.orthographicSize == orginalZoom)
+        {
+            scale.visibleScaleSize = originalScaleSize;
+        }
     }
 }

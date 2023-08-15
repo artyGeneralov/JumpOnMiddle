@@ -28,7 +28,9 @@ public class PlayerController : MonoBehaviour
         isScriptReady = true;
 
     }
-    void FixedUpdate()
+
+
+    void Update()
     {
         if (isScriptReady == false)
             return;
