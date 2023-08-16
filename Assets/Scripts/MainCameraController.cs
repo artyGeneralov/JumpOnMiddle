@@ -36,10 +36,6 @@ public class MainCameraController : MonoBehaviour
 
     void Update()
     {
-
-        // follow player
-        
-
         currentCameraPositionY = mainCamera.transform.position.y;
 
         if (Input.GetMouseButton(1))
@@ -54,9 +50,8 @@ public class MainCameraController : MonoBehaviour
             mainCamera.transform.position = new Vector3(mainCamera.transform.position.x,
                         Mathf.MoveTowards(mainCamera.transform.position.y, player.transform.position.y, playerFollowSpeed * Time.deltaTime),
                         mainCamera.transform.position.z);
-        }
         FollowPlayer();
-
+        }
     }
 
     public void FollowPlayer()
