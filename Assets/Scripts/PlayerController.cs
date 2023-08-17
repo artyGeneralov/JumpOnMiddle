@@ -5,55 +5,59 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
-    [SerializeField] float thrust;
-    [SerializeField] float rotSpeed = 5;
-    [SerializeField] float maxVelocity;
-    float curPos, lastPos;
-    bool isScriptReady;
+    public enum Direction
+    {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    }
 
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        Debug.Log(rb);
+    }
     void Start()
     {
-        isScriptReady = false;
-        StartCoroutine(StartWhenReady());
+        
     }
 
-    IEnumerator StartWhenReady()
-    {
-        while(rb == null)
-        {
-            rb = GetComponent<Rigidbody2D>();
-            yield return null;
-        }
-        curPos = lastPos = rb.position.x;
-        isScriptReady = true;
 
-    }
 
 
     void Update()
     {
-        if (isScriptReady == false)
-            return;
 
-        //rb.rotation += rotSpeed;
-        Vector3 jumpForce = new Vector3(thrust, thrust, 0);
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            rb.AddForce(jumpForce, ForceMode2D.Impulse);
-        }
-        lastPos = curPos;
-
-
-        ClampVelocity();
     }
 
-    void ClampVelocity()
-    {
-        Vector2 currentVelocity = rb.velocity;
 
-        if(currentVelocity.magnitude > maxVelocity)
+    public void ForceJump(float sideForce, float jumpForce, Direction direction = Direction.LEFT)
+    {
+        Debug.Log(rb);
+        if (direction == Direction.UP || direction == Direction.DOWN) { return; }
+        if (direction == Direction.LEFT) { sideForce = -sideForce; }
+        rb.AddForce(new Vector2(sideForce, jumpForce), ForceMode2D.Impulse);
+    }
+
+    public void ForceSide(float amount, Direction direction)
+    {
+        Vector2 forceVector;
+        if (direction == Direction.LEFT) { forceVector = Vector2.left * amount; }
+        else { forceVector = Vector2.right * amount; }
+        rb.AddForce(forceVector, ForceMode2D.Impulse);
+    }
+
+    public void ForceChange(float amount, Direction direction)
+    {
+        Vector2 forceVector = direction switch
         {
-            rb.velocity = currentVelocity.normalized * maxVelocity;
-        }
+            _ when direction == Direction.UP => Vector2.up * amount,
+            _ when direction == Direction.DOWN => Vector2.down * amount,
+            _ when direction == Direction.LEFT => Vector2.left * amount,
+            _ when direction == Direction.RIGHT => Vector2.right * amount,
+            _ => new Vector2()
+        };
+        rb.AddForce(forceVector, ForceMode2D.Force);
     }
 }

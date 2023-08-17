@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1650647836293871006}
   - component: {fileID: 1650647836293870995}
   - component: {fileID: 1650647836293870992}
-  - component: {fileID: 1216695918389788429}
+  - component: {fileID: 5844330918820147693}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 0.51152545, g: 0.8962264, b: 0.8684788, a: 1}
+  m_Color: {r: 1, g: 0.08880368, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -100,7 +100,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 0.9
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
@@ -136,7 +136,7 @@ PolygonCollider2D:
     - - {x: 0, y: 0.5773587}
       - {x: -0.5, y: -0.28866667}
       - {x: 0.5, y: -0.28866667}
---- !u!114 &1216695918389788429
+--- !u!114 &5844330918820147693
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,7 +148,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7356355b2706d948bbff6c3f8f2f013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  thrust: 0
-  rotSpeed: 5
-  maxVelocity: 0

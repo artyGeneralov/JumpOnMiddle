@@ -56,7 +56,6 @@ public class ScaleController : MonoBehaviour
             if(pos >= lowestRendered && pos <= highestRendered) { continue; }
             if(pos % largeNotchesInterval == 0)
             {
-                Debug.Log("New Large");
                 GameObject largeNotch = notchPool.Get(NotchPool.PrefabType.LargeNotch);
                 largeNotch.transform.position = new Vector3(largeNotchX, pos, largeNotch.transform.position.z);
                 TMPro.TextMeshPro txt = largeNotch.GetComponentInChildren<TMPro.TextMeshPro>();
@@ -64,7 +63,6 @@ public class ScaleController : MonoBehaviour
             }
             else if(pos % smallNotchesInterval == 0)
             {
-                Debug.Log("New Small");
                 GameObject smallNotch = notchPool.Get(NotchPool.PrefabType.SmallNotch);
                 smallNotch.transform.position = new Vector3(smallNotchX, pos, smallNotch.transform.position.z);
                 TMPro.TextMeshPro txt = smallNotch.GetComponentInChildren<TMPro.TextMeshPro>();
