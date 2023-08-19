@@ -6,9 +6,11 @@ public class GameManager : MonoBehaviour
 {
 
     [SerializeField] GameObject scissorsPrefab, baloonObsticlePrefab, powerUpPrefab, slowerObsticlePrefab;
+    [SerializeField] GameObject splashPrefab;
     [SerializeField] GameObject leftWall, rightWall;
     [SerializeField] GameObject player;
     [SerializeField] GameObject platform;
+    [SerializeField] GameObject ground;
     [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity, powerUpIncrease, slowerObsticleDecrease;
     [SerializeField] int numberOfScissors, numberOfPowerups, numberOfSlowerObsticles, numberOfBaloonObsticles;
     PlayerController playerController;
@@ -30,6 +32,11 @@ public class GameManager : MonoBehaviour
         baloonsManager = FindObjectOfType<BaloonsManager>();
         playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
 
+        ObsticleEventController groundEvent = ground.GetComponent<ObsticleEventController>();
+        if (groundEvent)
+        {
+            groundEvent.touchedPlayer += HandleGroundCollision;
+        }
 
         leftBound = leftWall.transform.position.x + 5;
         rightBound = rightWall.transform.position.x - 5;
@@ -127,6 +134,21 @@ public class GameManager : MonoBehaviour
     {
         baloonsManager.AddBaloon();
         playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+    }
+
+    void HandleGroundCollision()
+    {
+        // destroy player object
+        GameObject splash = Instantiate(splashPrefab, player.transform.position, Quaternion.identity);
+        playerController.GetCurrentFallingVelocity();
+        Renderer rend = player.GetComponent<Renderer>();
+        if (rend != null)
+        {
+            Color color = rend.material.color;
+            color.a = 0f;
+            rend.material.color = color;
+        }
+        // spawn splatter with radius proportional to final speed
     }
 
 

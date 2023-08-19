@@ -84,12 +84,13 @@ public class PlayerController : MonoBehaviour
 
     private void ApplySideDrag()
     {
-        // Calculate the horizontal drag based on the current horizontal velocity.
         float horizontalDrag = -rb.velocity.x * sideDrag;
-
-        // Apply the horizontal drag, but keep the vertical velocity the same.
         rb.velocity = new Vector2(rb.velocity.x + horizontalDrag * Time.fixedDeltaTime, rb.velocity.y);
     }
 
+    public float GetCurrentFallingVelocity()
+    {
+        return rb.velocity.y;
+    }
 
 }
