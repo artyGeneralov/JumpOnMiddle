@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject platform;
     [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount;
     PlayerController playerController;
+    
 
 
     bool canUpdate;
@@ -84,7 +85,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator JumpTimer()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.85f);
         isJumping = false;
     }
 }

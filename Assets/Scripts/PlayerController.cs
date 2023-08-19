@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
+    public float maxDropVelocity { get; set; }
     public enum Direction
     {
         UP,
@@ -12,23 +13,18 @@ public class PlayerController : MonoBehaviour
         LEFT,
         RIGHT
     }
-
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        Debug.Log(rb);
-    }
-    void Start()
-    {
-        
     }
 
 
-
-
-    void Update()
+    private void Update()
     {
-
+        if (rb.velocity.y > maxDropVelocity)
+        {
+            rb.velocity = Vector2.down * maxDropVelocity;
+        }
     }
 
 
@@ -60,4 +56,6 @@ public class PlayerController : MonoBehaviour
         };
         rb.AddForce(forceVector, ForceMode2D.Force);
     }
+
+    
 }
