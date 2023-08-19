@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,10 +15,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity, powerUpIncrease, slowerObsticleDecrease;
     [SerializeField] int numberOfScissors, numberOfPowerups, numberOfSlowerObsticles, numberOfBaloonObsticles;
     [SerializeField] float maxVelocityForSplatter, maxScaleForSplatter;
-    [SerializeField] GameObject instructionsUI;
-    [SerializeField] TMPro.TextMeshProUGUI currentSpeedUI;
+    [SerializeField] GameObject UIManagerObject;
     PlayerController playerController;
     BaloonsManager baloonsManager;
+    UIManager uiManager;
 
 
     bool isJumping;
@@ -35,8 +36,7 @@ public class GameManager : MonoBehaviour
         baloonsManager = FindObjectOfType<BaloonsManager>();
         playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
 
-        currentSpeedUI.alpha = 0f;
-
+        uiManager = UIManagerObject.GetComponent<UIManager>();
         ObsticleEventController groundEvent = ground.GetComponent<ObsticleEventController>();
         if (groundEvent)
         {
@@ -64,10 +64,8 @@ public class GameManager : MonoBehaviour
 
 
         // update current speed UI.
-        StringBuilder sb = new StringBuilder();
-        sb.Append("Current Speed: ");
-        sb.Append((int)Mathf.Abs(playerController.GetCurrentFallingVelocity()));
-        currentSpeedUI.text = sb.ToString();
+        uiManager.updateSpeed((int)Mathf.Abs(playerController.GetCurrentFallingVelocity()));
+
 
     }
 
@@ -100,8 +98,8 @@ public class GameManager : MonoBehaviour
             {
                 playerController.ForceJump(playerSideJumpForce, playerJumpForce, PlayerController.Direction.RIGHT);
                 isOnPlatform = false;
-                Destroy(instructionsUI);
-                currentSpeedUI.alpha = 1f;
+                uiManager.HideInstructions();
+                uiManager.SpawnSpeedCounter();
             }
         }    
     }
@@ -153,7 +151,13 @@ public class GameManager : MonoBehaviour
         float targetScale = proportion * maxScaleForSplatter;
 
         splash.transform.localScale = new Vector3(targetScale, 0.5f, 0);
+
+        uiManager.HideSpeedCounter();
+        uiManager.SpawnEndGameSummary((int)Mathf.Abs(currentFallingVelocity));
         //Debug.Log($"targetscale {targetScale}, proportion {proportion}, currentFallingVelocity, {currentFallingVelocity}");
+
+
+        // 
 
     }
 
@@ -252,4 +256,6 @@ public class GameManager : MonoBehaviour
 
         }
     }
+
+
 }
