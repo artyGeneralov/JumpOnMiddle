@@ -11,6 +11,7 @@ public class ObsticleEventController : MonoBehaviour
         if(other.gameObject.tag == "Player")
         {
             touchedPlayer?.Invoke();
+            if(this.gameObject.tag != "Ground")
             Destroy(this.gameObject);
         }
     }

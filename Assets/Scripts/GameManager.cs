@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject ground;
     [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity, powerUpIncrease, slowerObsticleDecrease;
     [SerializeField] int numberOfScissors, numberOfPowerups, numberOfSlowerObsticles, numberOfBaloonObsticles;
+    [SerializeField] float maxVelocityForSplatter, maxScaleForSplatter;
+    [SerializeField] GameObject instructionsUI;
+    [SerializeField] TMPro.TextMeshProUGUI currentSpeedUI;
     PlayerController playerController;
     BaloonsManager baloonsManager;
 
@@ -31,6 +34,8 @@ public class GameManager : MonoBehaviour
         playerController = player.GetComponent<PlayerController>();
         baloonsManager = FindObjectOfType<BaloonsManager>();
         playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+
+        currentSpeedUI.alpha = 0f;
 
         ObsticleEventController groundEvent = ground.GetComponent<ObsticleEventController>();
         if (groundEvent)
@@ -58,14 +63,17 @@ public class GameManager : MonoBehaviour
         KeyListeners();
 
 
-
-
+        // update current speed UI.
+        StringBuilder sb = new StringBuilder();
+        sb.Append("Current Speed: ");
+        sb.Append((int)Mathf.Abs(playerController.GetCurrentFallingVelocity()));
+        currentSpeedUI.text = sb.ToString();
 
     }
 
     IEnumerator JumpTimer()
     {
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.1f);
         isJumping = false;
     }
 
@@ -88,25 +96,14 @@ public class GameManager : MonoBehaviour
         }
         else if (isOnPlatform)
         {
-
-            if (Input.GetKeyDown(KeyCode.A) && !isJumping)
+            if (Input.GetKeyDown(KeyCode.D))
             {
-                isJumping = true;
-                playerController.ForceJump(playerSideJumpForce, playerJumpForce, PlayerController.Direction.LEFT);
-                StartCoroutine(JumpTimer());
-            }
-            else if (Input.GetKeyDown(KeyCode.D) && !isJumping)
-            {
-                isJumping = true;
                 playerController.ForceJump(playerSideJumpForce, playerJumpForce, PlayerController.Direction.RIGHT);
-                StartCoroutine(JumpTimer());
+                isOnPlatform = false;
+                Destroy(instructionsUI);
+                currentSpeedUI.alpha = 1f;
             }
-        }
-
-        if (player.transform.position.y < platform.transform.position.y)
-        {
-            isOnPlatform = false;
-        }
+        }    
     }
 
     void HandleScissors()
@@ -140,7 +137,7 @@ public class GameManager : MonoBehaviour
     {
         // destroy player object
         GameObject splash = Instantiate(splashPrefab, player.transform.position, Quaternion.identity);
-        playerController.GetCurrentFallingVelocity();
+        float currentFallingVelocity = playerController.GetCurrentFallingVelocity();
         Renderer rend = player.GetComponent<Renderer>();
         if (rend != null)
         {
@@ -148,7 +145,16 @@ public class GameManager : MonoBehaviour
             color.a = 0f;
             rend.material.color = color;
         }
+        player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+        baloonsManager.removeAllBaloons();
         // spawn splatter with radius proportional to final speed
+
+        float proportion = Mathf.Clamp(Mathf.Abs(currentFallingVelocity) / maxVelocityForSplatter, 0f, 1f);
+        float targetScale = proportion * maxScaleForSplatter;
+
+        splash.transform.localScale = new Vector3(targetScale, 0.5f, 0);
+        //Debug.Log($"targetscale {targetScale}, proportion {proportion}, currentFallingVelocity, {currentFallingVelocity}");
+
     }
 
 
@@ -193,6 +199,7 @@ public class GameManager : MonoBehaviour
 
             GameObject newPowerUp = Instantiate(powerUpPrefab, new Vector3(randPosX, randPosY, 0), Quaternion.identity);
             ObsticleEventController eventController = newPowerUp.GetComponent<ObsticleEventController>();
+            newPowerUp.transform.localScale = new Vector3(-1f, -1f, 1f);
             if (eventController)
             {
                 eventController.touchedPlayer += HandlePowerUp;

@@ -8,6 +8,7 @@ TagManager:
   - SmallNotch
   - Platform
   - Baloon
+  - Ground
   layers:
   - Default
   - TransparentFX

@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
         //apply side drag
 
         ApplySideDrag();
-        Debug.Log(rb.velocity + " " + maxDropVelocity);
+       // Debug.Log(rb.velocity + " " + maxDropVelocity);
     }
 
 
@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
             _ when direction == Direction.RIGHT => Vector2.right * amount,
             _ => new Vector2()
         };
-        Debug.Log("Force added: " + forceVector);
+       // Debug.Log("Force added: " + forceVector);
         rb.AddForce(forceVector, ForceMode2D.Impulse);
     }
 

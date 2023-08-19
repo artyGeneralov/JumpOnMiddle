@@ -47,6 +47,16 @@ public class BaloonsManager : MonoBehaviour
         // TODO: add pop animation
     }
 
+    public void removeAllBaloons()
+    {
+        for(int i = instantiatedBaloons.Count - 1; i >= 0; i--)
+        {
+            GameObject baloonToRemove = instantiatedBaloons[i];
+            instantiatedBaloons.RemoveAt(i);
+            Destroy(baloonToRemove);
+        }
+    }
+
     public int GetCurrentBaloonCount()
     {
         return instantiatedBaloons.Count;
