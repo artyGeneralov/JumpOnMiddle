@@ -5,46 +5,60 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
 
+    [SerializeField] GameObject scissorsPrefab, baloonObsticlePrefab, powerUpPrefab;
     [SerializeField] GameObject player;
     [SerializeField] GameObject platform;
-    [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount;
+    [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity;
+    [SerializeField] int numberOfScissors, numberOfPowerups, numberOfObsticles;
     PlayerController playerController;
-    
+    BaloonsManager baloonsManager;
 
 
-    bool canUpdate;
     bool isJumping;
     bool isOnPlatform;
-    // Start is called before the first frame update
+
     void Start()
     {
-        canUpdate = false;
+
         isJumping = false;
         isOnPlatform = true;
         playerController = player.GetComponent<PlayerController>();
-        StartCoroutine(DelayedStart());
-    }
+        baloonsManager = FindObjectOfType<BaloonsManager>();
+        playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
 
-    IEnumerator DelayedStart()
-    {
-        while (playerController == null)
-        {
-            yield return null;
-        }
-        canUpdate = true;
+        // generate scissors
+
+        // generate powerups
+
+        // generate obsticles
 
     }
 
-    // Update is called once per frame
+
+
+
     void Update()
     {
-        if (!canUpdate)
-            return;
+
 
 
         // listen for keys
+        KeyListeners();
 
-        // side push
+        
+        
+
+
+    }
+
+    IEnumerator JumpTimer()
+    {
+        yield return new WaitForSeconds(0.85f);
+        isJumping = false;
+    }
+
+    void KeyListeners()
+    {
         if (!isOnPlatform)
         {
             if (Input.GetKeyDown(KeyCode.A) && !isJumping)
@@ -83,9 +97,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator JumpTimer()
+
+    void GenerateScissors()
     {
-        yield return new WaitForSeconds(0.85f);
-        isJumping = false;
+
+    }
+
+    void GeneratePowerUps()
+    {
+
+    }
+
+    void GenerateObsticles()
+    {
+
     }
 }

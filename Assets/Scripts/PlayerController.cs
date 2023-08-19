@@ -21,10 +21,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (rb.velocity.y > maxDropVelocity)
+
+        // cap max drop velocity
+        if (Mathf.Abs(rb.velocity.y) > maxDropVelocity)
         {
-            rb.velocity = Vector2.down * maxDropVelocity;
+            rb.velocity = new Vector2(rb.velocity.x, -maxDropVelocity);
         }
+            Debug.Log(rb.velocity + " " + maxDropVelocity);
     }
 
 

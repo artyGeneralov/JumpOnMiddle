@@ -7,7 +7,7 @@ public class BaloonsManager : MonoBehaviour
     [SerializeField] GameObject baloonPrefab;
     [SerializeField] GameObject player;
     [SerializeField] List<Transform> attachmentPoints;
-    [SerializeField] int maxBaloons = 3;
+    [SerializeField] public readonly int maxBaloons = 3;
     List<GameObject> instantiatedBaloons;
 
     void Start()
@@ -47,7 +47,7 @@ public class BaloonsManager : MonoBehaviour
         // TODO: add pop animation
     }
 
-    public int CurrentBaloonCount()
+    public int GetCurrentBaloonCount()
     {
         return instantiatedBaloons.Count;
     }
