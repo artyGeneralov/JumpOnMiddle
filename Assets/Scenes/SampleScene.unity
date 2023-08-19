@@ -2444,5 +2444,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9089879045649221791, guid: f0f6de351a9291a4c870ab492f81fd96, type: 3}
+      propertyPath: m_text
+      value: "Press D to jump\n\nWhile falling press A & D to dash sideways\n\nTop
+        speed is determined by number of baloons!\n\nremoves baloon -\n      adds
+        baloon -\n           speed up -\n       speed down -\n\nPress Right Mouse
+        Button to Zoom Out!\nGo as fast as you can!\n\n"
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f0f6de351a9291a4c870ab492f81fd96, type: 3}
