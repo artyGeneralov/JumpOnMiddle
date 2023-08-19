@@ -5,17 +5,21 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
 
-    [SerializeField] GameObject scissorsPrefab, baloonObsticlePrefab, powerUpPrefab;
+    [SerializeField] GameObject scissorsPrefab, baloonObsticlePrefab, powerUpPrefab, slowerObsticlePrefab;
+    [SerializeField] GameObject leftWall, rightWall;
     [SerializeField] GameObject player;
     [SerializeField] GameObject platform;
-    [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity;
-    [SerializeField] int numberOfScissors, numberOfPowerups, numberOfObsticles;
+    [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity, powerUpIncrease, slowerObsticleDecrease;
+    [SerializeField] int numberOfScissors, numberOfPowerups, numberOfSlowerObsticles, numberOfBaloonObsticles;
     PlayerController playerController;
     BaloonsManager baloonsManager;
 
 
     bool isJumping;
     bool isOnPlatform;
+
+    float leftBound;
+    float rightBound;
 
     void Start()
     {
@@ -26,12 +30,13 @@ public class GameManager : MonoBehaviour
         baloonsManager = FindObjectOfType<BaloonsManager>();
         playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
 
-        // generate scissors
 
-        // generate powerups
+        leftBound = leftWall.transform.position.x + 5;
+        rightBound = rightWall.transform.position.x - 5;
 
-        // generate obsticles
-
+        GenerateScissors();
+        GeneratePowerUps();
+        GenerateObsticles();
     }
 
 
@@ -45,15 +50,15 @@ public class GameManager : MonoBehaviour
         // listen for keys
         KeyListeners();
 
-        
-        
+
+
 
 
     }
 
     IEnumerator JumpTimer()
     {
-        yield return new WaitForSeconds(0.85f);
+        yield return new WaitForSeconds(0.3f);
         isJumping = false;
     }
 
@@ -97,19 +102,125 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void HandleScissors()
+    {
+        baloonsManager.RemoveBaloon();
+        playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+    }
+
+    void HandlePowerUp()
+    {
+        // add current speed
+        if (baloonsManager.GetCurrentBaloonCount() == 0)
+        {
+            playerController.maxDropVelocity += powerUpIncrease;
+        }
+        playerController.AddFlatVelocity(powerUpIncrease);
+    }
+
+    void HandleSlowerObsticle()
+    {
+        playerController.DropVelocity();
+    }
+
+    void HandleBaloonPickup()
+    {
+        baloonsManager.AddBaloon();
+        playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+    }
+
 
     void GenerateScissors()
     {
+        for (int i = 0; i < numberOfScissors; i++)
+        {
+            // generate scissors in upper half 
 
+            // height bounds:
+            float upperBound = platform.transform.position.y - 50;
+            float lowerBound = platform.transform.position.y / 2;
+
+
+
+            float randPosY = Random.Range(lowerBound, upperBound);
+            float randPosX = Random.Range(leftBound, rightBound);
+
+            GameObject newScissors = Instantiate(scissorsPrefab, new Vector3(randPosX, randPosY, 0), Quaternion.identity);
+            ObsticleEventController eventController = newScissors.GetComponent<ObsticleEventController>();
+            if (eventController)
+            {
+                eventController.touchedPlayer += HandleScissors;
+            }
+
+        }
     }
 
     void GeneratePowerUps()
     {
+        // generate powerups in lower half
+        for (int i = 0; i < numberOfPowerups; i++)
+        {
 
+            // height bounds:
+            float upperBound = platform.transform.position.y / 2;
+            float lowerBound = 50;
+
+
+            float randPosY = Random.Range(lowerBound, upperBound);
+            float randPosX = Random.Range(leftBound, rightBound);
+
+            GameObject newPowerUp = Instantiate(powerUpPrefab, new Vector3(randPosX, randPosY, 0), Quaternion.identity);
+            ObsticleEventController eventController = newPowerUp.GetComponent<ObsticleEventController>();
+            if (eventController)
+            {
+                eventController.touchedPlayer += HandlePowerUp;
+            }
+
+        }
     }
 
     void GenerateObsticles()
     {
+        // generate baloons obsticles in lower half
+        for (int i = 0; i < numberOfBaloonObsticles; i++)
+        {
 
+            // height bounds:
+            float upperBound = platform.transform.position.y / 2;
+            float lowerBound = 50;
+
+
+            float randPosY = Random.Range(lowerBound, upperBound);
+            float randPosX = Random.Range(leftBound, rightBound);
+
+            GameObject newBaloonObsticle = Instantiate(baloonObsticlePrefab, new Vector3(randPosX, randPosY, 0), Quaternion.identity);
+            ObsticleEventController eventController = newBaloonObsticle.GetComponent<ObsticleEventController>();
+            if (eventController)
+            {
+                eventController.touchedPlayer += HandleBaloonPickup;
+            }
+
+        }
+
+        // generate slowdown obsticles everywhere
+        for (int i = 0; i < numberOfSlowerObsticles; i++)
+        {
+
+            // height bounds:
+            float upperBound = platform.transform.position.y - 50;
+            float lowerBound = 50;
+
+
+            float randPosY = Random.Range(lowerBound, upperBound);
+            float randPosX = Random.Range(leftBound, rightBound);
+
+            GameObject newSlowerObsticle = Instantiate(slowerObsticlePrefab, new Vector3(randPosX, randPosY, 0), Quaternion.identity);
+            ObsticleEventController eventController = newSlowerObsticle.GetComponent<ObsticleEventController>();
+            if (eventController)
+            {
+                eventController.touchedPlayer += HandleSlowerObsticle;
+            }
+
+        }
     }
 }
