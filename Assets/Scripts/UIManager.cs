@@ -1,5 +1,7 @@
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -7,8 +9,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject instructionsUI;
     [SerializeField] TMPro.TextMeshProUGUI currentSpeedUI;
     [SerializeField] TMPro.TextMeshProUGUI endScreenUI;
+    [SerializeField] TMPro.TextMeshProUGUI InvCounter;
+    [SerializeField] GameObject invPanel;
     [SerializeField] GameObject currentSpeedPanel;
     [SerializeField] GameObject endGamePanel;
+    [SerializeField] int InvulnurabilityDepletionSpeed = 1;
+
     string speedPrefix = "Current Speed: ";
     UIChannel uiChannel;
 
@@ -17,12 +23,19 @@ public class UIManager : MonoBehaviour
         instructionsUI.SetActive(true);
         currentSpeedPanel.SetActive(false);
         endGamePanel.SetActive(false);
+        addListeners();
+    }
+
+
+    private void addListeners()
+    {
         var bacon = FindObjectOfType<Beacon>();
         uiChannel = bacon.UIChannel;
         uiChannel.HideInstructionEvent += HideInstructions;
         uiChannel.ShowEndScreenEvent += SpawnEndGameSummary;
-        uiChannel.UpdateSpeedEvent += updateSpeed;
+        uiChannel.UpdateSpeedEvent += UpdateSpeed;
         uiChannel.ShowSpeedCounterEvent += SpawnSpeedCounter;
+        uiChannel.UpdateInvEvent += UpdateInv;
     }
 
     public void SpawnInstruction()
@@ -45,6 +58,23 @@ public class UIManager : MonoBehaviour
         currentSpeedPanel.SetActive(false);
     }
 
+    public void SpawnInv()
+    {
+        invPanel.SetActive(true);
+    }
+
+    public void HideInv()
+    {
+        invPanel.SetActive(false);
+    }
+
+    public void UpdateInv(int amount)
+    {
+            Slider slider = invPanel.GetComponentInChildren<Slider>();
+            slider.value = amount / 100f;
+            InvCounter.text = amount.ToString();
+    }
+
     public void SpawnEndGameSummary()
     {
         string speedText = currentSpeedUI.text;
@@ -65,7 +95,7 @@ public class UIManager : MonoBehaviour
         endScreenUI.alpha = 0f;
     }
 
-    public void updateSpeed(int speed)
+    public void UpdateSpeed(int speed)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(speedPrefix);
@@ -73,11 +103,12 @@ public class UIManager : MonoBehaviour
         currentSpeedUI.text = sb.ToString();
     }
 
+
     private void OnDestroy()
     {
         uiChannel.HideInstructionEvent -= HideInstructions;
         uiChannel.ShowEndScreenEvent -= SpawnEndGameSummary;
-        uiChannel.UpdateSpeedEvent -= updateSpeed;
+        uiChannel.UpdateSpeedEvent -= UpdateSpeed;
         uiChannel.ShowSpeedCounterEvent -= SpawnSpeedCounter;
     }
 }

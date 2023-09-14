@@ -22,6 +22,8 @@ public class InputChannel : ScriptableObject, IPlayerActions, ICameraActions
     public Action<Vector2> MoveEvent;
     public Action ZoomOutEvent;
     public Action ZoomInEvent;
+    public Action EnableInvulnurable;
+    public Action DisableInvulnurable;
     
 
     public void OnMove(InputAction.CallbackContext context)
@@ -36,5 +38,15 @@ public class InputChannel : ScriptableObject, IPlayerActions, ICameraActions
     public void OnZoomIn(InputAction.CallbackContext context)
     {
         ZoomInEvent?.Invoke();
+    }
+
+    public void OnEnableInvulnurable(InputAction.CallbackContext context)
+    {
+        EnableInvulnurable?.Invoke();
+    }
+
+    public void OnDisableInvulnurable(InputAction.CallbackContext context)
+    {
+        DisableInvulnurable?.Invoke();
     }
 }

@@ -4,11 +4,24 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
+    SpriteRenderer sr;
     InputChannel inputChannel;
+    UIChannel uIChannel;
     bool isJumping = false;
     bool isOnPlatform = true;
+    [SerializeField] Color invColor;
+    [SerializeField] Color mainColor;
     [SerializeField] float sideDrag = 0.8f;
+
+    [SerializeField] float InvulnurabilityDepletionSpeed;
+    
+
+    [SerializeField] int InvulnurabilityDepletionAmount = 1;
+    [SerializeField] int maxInv = 100;
+    int curInv;
+
     public float maxDropVelocity { get; set; }
+    public bool isVulnurable { get; private set; }
     public enum Direction
     {
         UP,
@@ -20,32 +33,63 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        curInv = maxInv;
+        isVulnurable = true;
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
         addListeners();
     }
 
     private void addListeners()
     {
         var bacon = FindObjectOfType<Beacon>();
+        uIChannel = bacon.UIChannel;
         inputChannel = bacon.inputChannel;
         inputChannel.MoveEvent += HandleMovement;
+        inputChannel.EnableInvulnurable += enableInv;
+        inputChannel.DisableInvulnurable += disableInv;
     }
 
+
+    private float nextUpdateTime;
     private void Update()
     {
-
+        if (!isVulnurable)
+        {
+            if (Time.time > nextUpdateTime)
+            {
+                curInv -= InvulnurabilityDepletionAmount;
+                if(curInv < 0) { curInv = 0; }
+                uIChannel.UpdateInv(curInv);
+                nextUpdateTime = Time.time + InvulnurabilityDepletionSpeed;
+            }
+        }
+        
     }
+
+    private void enableInv()
+    {
+        isVulnurable = false;
+        sr.color = invColor;
+    }
+
+    private void disableInv()
+    {
+        isVulnurable = true;
+        sr.color = mainColor;
+    }
+
 
 
 
     // for new input
     private void HandleMovement(Vector2 direction)
     {
-        if(direction == Vector2.left)
+        if (direction == Vector2.left)
         {
             HandleMovement(Direction.LEFT);
         }
-        else if(direction == Vector2.right)
+        else if (direction == Vector2.right)
         {
             HandleMovement(Direction.RIGHT);
         }
@@ -55,7 +99,7 @@ public class PlayerController : MonoBehaviour
     {
         if (isOnPlatform && direction == Direction.LEFT)
             return;
-        if(isOnPlatform && direction == Direction.RIGHT)
+        if (isOnPlatform && direction == Direction.RIGHT)
         {
             // jump
             GameManager gm = FindObjectOfType<GameManager>();
@@ -83,7 +127,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         isJumping = false;
     }
-    
+
 
 
     private void FixedUpdate()
@@ -99,7 +143,7 @@ public class PlayerController : MonoBehaviour
         //apply side drag
 
         ApplySideDrag();
-       // Debug.Log(rb.velocity + " " + maxDropVelocity);
+        // Debug.Log(rb.velocity + " " + maxDropVelocity);
     }
 
 
@@ -135,7 +179,7 @@ public class PlayerController : MonoBehaviour
             _ when direction == Direction.RIGHT => Vector2.right * amount,
             _ => new Vector2()
         };
-       // Debug.Log("Force added: " + forceVector);
+        // Debug.Log("Force added: " + forceVector);
         rb.AddForce(forceVector, ForceMode2D.Impulse);
     }
 
@@ -163,6 +207,8 @@ public class PlayerController : MonoBehaviour
     private void OnDestroy()
     {
         inputChannel.MoveEvent -= HandleMovement;
+        inputChannel.EnableInvulnurable -= enableInv;
+        inputChannel.DisableInvulnurable -= disableInv;
     }
 
 }

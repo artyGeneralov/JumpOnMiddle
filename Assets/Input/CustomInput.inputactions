@@ -13,6 +13,24 @@
                     "processors": "StickDeadzone",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "EnableInvulnurable",
+                    "type": "Button",
+                    "id": "c27fb184-e14b-412d-9cde-ad5b2ff76d44",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DisableInvulnurable",
+                    "type": "Button",
+                    "id": "d5fb7295-f700-4adb-98f8-1ae4e6102f8f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -81,6 +99,17 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "2b1f06ca-01dc-4cf8-834f-9f5b8016dc4a",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EnableInvulnurable",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

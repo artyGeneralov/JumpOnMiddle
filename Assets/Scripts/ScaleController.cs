@@ -95,4 +95,5 @@ public class ScaleController : MonoBehaviour
         cameraMiddle = mainCamera.currentCameraPositionY;
     }
 
+
 }

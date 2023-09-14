@@ -35,6 +35,24 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""processors"": ""StickDeadzone"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""EnableInvulnurable"",
+                    ""type"": ""Button"",
+                    ""id"": ""c27fb184-e14b-412d-9cde-ad5b2ff76d44"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DisableInvulnurable"",
+                    ""type"": ""Button"",
+                    ""id"": ""d5fb7295-f700-4adb-98f8-1ae4e6102f8f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -103,6 +121,17 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b1f06ca-01dc-4cf8-834f-9f5b8016dc4a"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EnableInvulnurable"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -160,6 +189,8 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+        m_Player_EnableInvulnurable = m_Player.FindAction("EnableInvulnurable", throwIfNotFound: true);
+        m_Player_DisableInvulnurable = m_Player.FindAction("DisableInvulnurable", throwIfNotFound: true);
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_ZoomOut = m_Camera.FindAction("ZoomOut", throwIfNotFound: true);
@@ -226,11 +257,15 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Player;
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
+    private readonly InputAction m_Player_EnableInvulnurable;
+    private readonly InputAction m_Player_DisableInvulnurable;
     public struct PlayerActions
     {
         private @CustomInput m_Wrapper;
         public PlayerActions(@CustomInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
+        public InputAction @EnableInvulnurable => m_Wrapper.m_Player_EnableInvulnurable;
+        public InputAction @DisableInvulnurable => m_Wrapper.m_Player_DisableInvulnurable;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -243,6 +278,12 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
+            @EnableInvulnurable.started += instance.OnEnableInvulnurable;
+            @EnableInvulnurable.performed += instance.OnEnableInvulnurable;
+            @EnableInvulnurable.canceled += instance.OnDisableInvulnurable;
+            @DisableInvulnurable.started += instance.OnDisableInvulnurable;
+            @DisableInvulnurable.performed += instance.OnDisableInvulnurable;
+            @DisableInvulnurable.canceled += instance.OnDisableInvulnurable;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -250,6 +291,12 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
+            @EnableInvulnurable.started -= instance.OnEnableInvulnurable;
+            @EnableInvulnurable.performed -= instance.OnEnableInvulnurable;
+            @EnableInvulnurable.canceled -= instance.OnDisableInvulnurable;
+            @DisableInvulnurable.started -= instance.OnDisableInvulnurable;
+            @DisableInvulnurable.performed -= instance.OnDisableInvulnurable;
+            @DisableInvulnurable.canceled -= instance.OnDisableInvulnurable;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -300,10 +347,10 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         {
             @ZoomOut.started -= instance.OnZoomOut;
             @ZoomOut.performed -= instance.OnZoomOut;
-            @ZoomOut.canceled -= instance.OnZoomOut;
+            @ZoomOut.canceled -= instance.OnZoomIn;
             @ZoomIn.started -= instance.OnZoomIn;
             @ZoomIn.performed -= instance.OnZoomIn;
-            @ZoomIn.canceled -= instance.OnZoomIn;
+            @ZoomIn.canceled -= instance.OnZoomOut;
         }
 
         public void RemoveCallbacks(ICameraActions instance)
@@ -324,6 +371,8 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
     public interface IPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
+        void OnEnableInvulnurable(InputAction.CallbackContext context);
+        void OnDisableInvulnurable(InputAction.CallbackContext context);
     }
     public interface ICameraActions
     {

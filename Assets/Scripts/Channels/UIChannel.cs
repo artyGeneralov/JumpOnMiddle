@@ -8,6 +8,7 @@ public class UIChannel : ScriptableObject
     public Action ShowEndScreenEvent;
     public Action<int> UpdateSpeedEvent;
     public Action ShowSpeedCounterEvent;
+    public Action<int> UpdateInvEvent;
 
     public void HideInstructionUI()
     {
@@ -27,6 +28,10 @@ public class UIChannel : ScriptableObject
     public void ShowSpeedCounter()
     {
         ShowSpeedCounterEvent?.Invoke();
+    }
+    public void UpdateInv(int amount)
+    {
+        UpdateInvEvent?.Invoke(amount);
     }
 
 }

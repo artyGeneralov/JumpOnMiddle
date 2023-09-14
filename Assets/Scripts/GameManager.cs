@@ -18,7 +18,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject UIManagerObject;
     PlayerController playerController;
     BaloonsManager baloonsManager;
-    //UIManager uiManager;
+
+
 
     UIChannel uIChannel;
 
@@ -27,14 +28,12 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-
         var bacon = FindObjectOfType<Beacon>();
         uIChannel = bacon.UIChannel;
         playerController = player.GetComponent<PlayerController>();
         baloonsManager = FindObjectOfType<BaloonsManager>();
         playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
 
-        //uiManager = UIManagerObject.GetComponent<UIManager>();
         ObsticleEventController groundEvent = ground.GetComponent<ObsticleEventController>();
         if (groundEvent)
         {
@@ -52,38 +51,51 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-
         // update current speed UI.
         uIChannel.UpdateSpeed((int)Mathf.Abs(playerController.GetCurrentFallingVelocity()));
+
 
     }
 
 
     void HandleScissors()
     {
-        baloonsManager.RemoveBaloon();
-        playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+        if (playerController.isVulnurable == true)
+        {
+            baloonsManager.RemoveBaloon();
+            playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+        }
     }
 
     void HandlePowerUp()
     {
-        // add current speed
-        if (baloonsManager.GetCurrentBaloonCount() == 0)
+        if (playerController.isVulnurable == true)
         {
-            playerController.maxDropVelocity += powerUpIncrease;
+            // add current speed
+            if (baloonsManager.GetCurrentBaloonCount() == 0)
+            {
+                playerController.maxDropVelocity += powerUpIncrease;
+            }
+            playerController.AddFlatVelocity(powerUpIncrease);
         }
-        playerController.AddFlatVelocity(powerUpIncrease);
     }
 
     void HandleSlowerObsticle()
     {
-        playerController.DropVelocity();
+
+        if (playerController.isVulnurable == true)
+        {
+            playerController.DropVelocity();
+        }
     }
 
     void HandleBaloonPickup()
     {
-        baloonsManager.AddBaloon();
-        playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+        if (playerController.isVulnurable == true)
+        {
+            baloonsManager.AddBaloon();
+            playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
+        }
     }
 
     void HandleGroundCollision()
@@ -107,13 +119,9 @@ public class GameManager : MonoBehaviour
 
         splash.transform.localScale = new Vector3(targetScale, 0.5f, 0);
 
-        //uiManager.HideSpeedCounter();
-        //uiManager.SpawnEndGameSummary((int)Mathf.Abs(currentFallingVelocity));
+
         uIChannel.ShowEndScreenUI();
-        //Debug.Log($"targetscale {targetScale}, proportion {proportion}, currentFallingVelocity, {currentFallingVelocity}");
 
-
-        // 
 
     }
 
@@ -212,6 +220,8 @@ public class GameManager : MonoBehaviour
 
         }
     }
+
+
 
 
 }
