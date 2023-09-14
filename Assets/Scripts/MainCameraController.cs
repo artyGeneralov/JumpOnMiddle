@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class MainCameraController : MonoBehaviour
@@ -21,8 +20,11 @@ public class MainCameraController : MonoBehaviour
     public float currentCameraPositionX { get; private set; }
 
     ScaleController scale;
+
+    InputChannel inputChannel;
     [HideInInspector] public int originalScaleSize;
 
+    bool shouldZoomOut = false;
 
     void Start()
     {
@@ -32,13 +34,29 @@ public class MainCameraController : MonoBehaviour
         originalOrthographicSize = mainCamera.orthographicSize;
         currentCameraPositionY = mainCamera.transform.position.y;
         currentCameraPositionX = mainCamera.transform.position.x;
+        addListeners();
+    }
+
+    private void addListeners()
+    {
+        var bacon = FindObjectOfType<Beacon>();
+        inputChannel = bacon.inputChannel;
+        inputChannel.ZoomOutEvent += HandleZoomOut;
+        inputChannel.ZoomInEvent += HandleZoomIn;
+    }
+    private void HandleZoomOut()
+    {
+        shouldZoomOut = true;
+    }
+    private void HandleZoomIn()
+    {
+        shouldZoomOut = false;
     }
 
     void Update()
     {
         currentCameraPositionY = mainCamera.transform.position.y;
-
-        if (Input.GetMouseButton(1))
+        if (shouldZoomOut)
         {
 
             ZoomOut();
@@ -79,5 +97,11 @@ public class MainCameraController : MonoBehaviour
         {
             scale.visibleScaleSize = originalScaleSize;
         }
+    }
+
+    private void OnDestroy()
+    {
+        inputChannel.ZoomOutEvent -= HandleZoomOut;
+        inputChannel.ZoomInEvent -= HandleZoomIn;
     }
 }

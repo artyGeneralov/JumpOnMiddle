@@ -9,13 +9,20 @@ public class UIManager : MonoBehaviour
     [SerializeField] TMPro.TextMeshProUGUI endScreenUI;
     [SerializeField] GameObject currentSpeedPanel;
     [SerializeField] GameObject endGamePanel;
+    string speedPrefix = "Current Speed: ";
+    UIChannel uiChannel;
 
     private void Start()
     {
         instructionsUI.SetActive(true);
         currentSpeedPanel.SetActive(false);
         endGamePanel.SetActive(false);
-        
+        var bacon = FindObjectOfType<Beacon>();
+        uiChannel = bacon.UIChannel;
+        uiChannel.HideInstructionEvent += HideInstructions;
+        uiChannel.ShowEndScreenEvent += SpawnEndGameSummary;
+        uiChannel.UpdateSpeedEvent += updateSpeed;
+        uiChannel.ShowSpeedCounterEvent += SpawnSpeedCounter;
     }
 
     public void SpawnInstruction()
@@ -38,8 +45,12 @@ public class UIManager : MonoBehaviour
         currentSpeedPanel.SetActive(false);
     }
 
-    public void SpawnEndGameSummary(int finalVelocity)
+    public void SpawnEndGameSummary()
     {
+        string speedText = currentSpeedUI.text;
+        int finalVelocity = int.Parse(speedText.Substring(speedText.IndexOf(speedPrefix) + speedPrefix.Length));
+
+        HideSpeedCounter();
         StringBuilder sb = new StringBuilder();
         sb.Append("You've reached the ground with a speed of: ");
         sb.Append(finalVelocity);
@@ -57,8 +68,16 @@ public class UIManager : MonoBehaviour
     public void updateSpeed(int speed)
     {
         StringBuilder sb = new StringBuilder();
-        sb.Append("Current Speed: ");
+        sb.Append(speedPrefix);
         sb.Append(speed);
         currentSpeedUI.text = sb.ToString();
+    }
+
+    private void OnDestroy()
+    {
+        uiChannel.HideInstructionEvent -= HideInstructions;
+        uiChannel.ShowEndScreenEvent -= SpawnEndGameSummary;
+        uiChannel.UpdateSpeedEvent -= updateSpeed;
+        uiChannel.ShowSpeedCounterEvent -= SpawnSpeedCounter;
     }
 }

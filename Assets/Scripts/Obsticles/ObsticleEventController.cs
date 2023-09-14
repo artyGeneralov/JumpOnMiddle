@@ -8,11 +8,11 @@ public class ObsticleEventController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player")
         {
             touchedPlayer?.Invoke();
-            if(this.gameObject.tag != "Ground")
-            Destroy(this.gameObject);
+            if (this.gameObject.tag != "Ground")
+                Destroy(this.gameObject);
         }
     }
 

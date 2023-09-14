@@ -12,17 +12,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject player;
     [SerializeField] GameObject platform;
     [SerializeField] GameObject ground;
-    [SerializeField] float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity, powerUpIncrease, slowerObsticleDecrease;
+    [SerializeField] public float playerJumpForce, playerSideJumpForce, playerLinearSideForce, playerForceChangeAmount, playerVelocityPerBaloon, playerBaseMaxDropVelocity, powerUpIncrease, slowerObsticleDecrease;
     [SerializeField] int numberOfScissors, numberOfPowerups, numberOfSlowerObsticles, numberOfBaloonObsticles;
     [SerializeField] float maxVelocityForSplatter, maxScaleForSplatter;
     [SerializeField] GameObject UIManagerObject;
     PlayerController playerController;
     BaloonsManager baloonsManager;
-    UIManager uiManager;
+    //UIManager uiManager;
 
-
-    bool isJumping;
-    bool isOnPlatform;
+    UIChannel uIChannel;
 
     float leftBound;
     float rightBound;
@@ -30,13 +28,13 @@ public class GameManager : MonoBehaviour
     void Start()
     {
 
-        isJumping = false;
-        isOnPlatform = true;
+        var bacon = FindObjectOfType<Beacon>();
+        uIChannel = bacon.UIChannel;
         playerController = player.GetComponent<PlayerController>();
         baloonsManager = FindObjectOfType<BaloonsManager>();
         playerController.maxDropVelocity = playerBaseMaxDropVelocity - (playerVelocityPerBaloon * baloonsManager.GetCurrentBaloonCount());
 
-        uiManager = UIManagerObject.GetComponent<UIManager>();
+        //uiManager = UIManagerObject.GetComponent<UIManager>();
         ObsticleEventController groundEvent = ground.GetComponent<ObsticleEventController>();
         if (groundEvent)
         {
@@ -52,57 +50,14 @@ public class GameManager : MonoBehaviour
     }
 
 
-
-
     void Update()
     {
 
-
-
-        // listen for keys
-        KeyListeners();
-
-
         // update current speed UI.
-        uiManager.updateSpeed((int)Mathf.Abs(playerController.GetCurrentFallingVelocity()));
-
+        uIChannel.UpdateSpeed((int)Mathf.Abs(playerController.GetCurrentFallingVelocity()));
 
     }
 
-    IEnumerator JumpTimer()
-    {
-        yield return new WaitForSeconds(0.1f);
-        isJumping = false;
-    }
-
-    void KeyListeners()
-    {
-        if (!isOnPlatform)
-        {
-            if (Input.GetKeyDown(KeyCode.A) && !isJumping)
-            {
-                isJumping = true;
-                playerController.ForceSide(playerLinearSideForce, PlayerController.Direction.LEFT);
-                StartCoroutine(JumpTimer());
-            }
-            else if (Input.GetKeyDown(KeyCode.D) && !isJumping)
-            {
-                isJumping = true;
-                playerController.ForceSide(playerLinearSideForce, PlayerController.Direction.RIGHT);
-                StartCoroutine(JumpTimer());
-            }
-        }
-        else if (isOnPlatform)
-        {
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                playerController.ForceJump(playerSideJumpForce, playerJumpForce, PlayerController.Direction.RIGHT);
-                isOnPlatform = false;
-                uiManager.HideInstructions();
-                uiManager.SpawnSpeedCounter();
-            }
-        }    
-    }
 
     void HandleScissors()
     {
@@ -152,8 +107,9 @@ public class GameManager : MonoBehaviour
 
         splash.transform.localScale = new Vector3(targetScale, 0.5f, 0);
 
-        uiManager.HideSpeedCounter();
-        uiManager.SpawnEndGameSummary((int)Mathf.Abs(currentFallingVelocity));
+        //uiManager.HideSpeedCounter();
+        //uiManager.SpawnEndGameSummary((int)Mathf.Abs(currentFallingVelocity));
+        uIChannel.ShowEndScreenUI();
         //Debug.Log($"targetscale {targetScale}, proportion {proportion}, currentFallingVelocity, {currentFallingVelocity}");
 
 
